@@ -29,7 +29,7 @@ package body Random_Forest is
 
    -- Select random feature subspace (sqrt of total features)
    function Get_Subspace (Total_Features : Positive; Gen : in out Generator) return Index_Array is
-      Sub_Size : Positive := Positive (Float'Max (1.0, Float'Rounding (Sqrt (Float (Total_Features)))));
+      Sub_Size : constant Positive := Positive (Float'Max (1.0, Float'Rounding (Sqrt (Float (Total_Features)))));
       All_Feats : Index_Array (1 .. Total_Features);
    begin
       for I in All_Feats'Range loop
@@ -54,7 +54,7 @@ package body Random_Forest is
       end loop;
       
       declare
-         Counts : array (Min_L .. Max_L) of Natural := (others => 0);
+         Counts : array (Min_L .. Max_L) of Natural := [others => 0];
       begin
          for Idx of Indices loop
             Counts (Labels (Idx)) := Counts (Labels (Idx)) + 1;
@@ -109,7 +109,7 @@ package body Random_Forest is
       Best_Thresh  : Feature_Value := 0.0;
       Found_Split  : Boolean := False;
       
-      Subspace     : Index_Array := Get_Subspace (Data'Length (2), Gen);
+      Subspace     : constant Index_Array := Get_Subspace (Data'Length (2), Gen);
       Min_Val, Max_Val : Feature_Value;
       Test_Thresh  : Feature_Value;
       
@@ -143,7 +143,7 @@ package body Random_Forest is
                   if Labels (Idx) > Max_L then Max_L := Labels (Idx); end if;
                end loop;
                declare
-                  Counts : array (Min_L .. Max_L) of Natural := (others => 0);
+                  Counts : array (Min_L .. Max_L) of Natural := [others => 0];
                begin
                   for Idx of Indices loop
                      Counts (Labels (Idx)) := Counts (Labels (Idx)) + 1;
@@ -298,7 +298,7 @@ package body Random_Forest is
       Best_Thresh  : Feature_Value := 0.0;
       Found_Split  : Boolean := False;
       
-      Subspace     : Index_Array := Get_Subspace (Data'Length (2), Gen);
+      Subspace     : constant Index_Array := Get_Subspace (Data'Length (2), Gen);
       Min_Val, Max_Val : Feature_Value;
       Test_Thresh  : Feature_Value;
       
