@@ -111,6 +111,7 @@ begin
          -- We purposely use mismatched lengths to trigger assertion / constraint failure
          Bad_Labels : constant Class_Array (1 .. 3) := [0, 0, 0];
          D : Classification_Forest (1) := Train_Classifier (X_Class, Bad_Labels, 1, 3);
+         pragma Unreferenced (D);
       begin
          Check ("9.1 Mismatched lengths should fail", False);
       end;
@@ -126,7 +127,10 @@ begin
    begin
       declare
          -- Type Num_Trees is Positive, so 0 throws Constraint_Error on instantiation
+         pragma Warnings (Off);
          D : Classification_Forest (0); 
+         pragma Unreferenced (D);
+         pragma Warnings (On);
       begin
          Check ("10.1 Zero trees should be statically/dynamically rejected", False);
       end;
