@@ -17,15 +17,15 @@ procedure Tests is
    end Check;
 
    -- Datasets for testing
-   X_Class : constant Matrix (1 .. 4, 1 .. 2) := ((0.0, 0.0), (0.0, 1.0), (1.0, 0.0), (1.0, 1.0));
-   Y_Class : constant Class_Array (1 .. 4) := (0, 1, 1, 0); -- XOR problem
+   X_Class : constant Matrix (1 .. 4, 1 .. 2) := [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]];
+   Y_Class : constant Class_Array (1 .. 4) := [0, 1, 1, 0]; -- XOR problem
 
-   X_Reg   : constant Matrix (1 .. 5, 1 .. 1) := ((1.0,), (2.0,), (3.0,), (4.0,), (5.0,));
-   Y_Reg   : constant Target_Array (1 .. 5) := (10.0, 20.0, 30.0, 40.0, 50.0);
+   X_Reg   : constant Matrix (1 .. 5, 1 .. 1) := [[1.0], [2.0], [3.0], [4.0], [5.0]];
+   Y_Reg   : constant Target_Array (1 .. 5) := [10.0, 20.0, 30.0, 40.0, 50.0];
 
-   Single_X : constant Matrix (1 .. 1, 1 .. 1) := ((42.0,), others => (0.0,));
-   Single_Y_C : constant Class_Array (1 .. 1) := (7, others => 0);
-   Single_Y_R : constant Target_Array (1 .. 1) := (3.14, others => 0.0);
+   Single_X : constant Matrix (1 .. 1, 1 .. 1) := [[42.0]];
+   Single_Y_C : constant Class_Array (1 .. 1) := [7];
+   Single_Y_R : constant Target_Array (1 .. 1) := [3.14];
 
    CF_Std : Classification_Forest (Num_Trees => 10);
    RF_Std : Regression_Forest (Num_Trees => 10);
@@ -43,8 +43,8 @@ begin
    -- TEST 2 — Predict Classification (Standard RF)
    Put_Line ("TEST 2 — Predict Classification (Standard RF)");
    declare
-      Pred_01 : constant Class_Label := Predict_Class (CF_Std, (0.0, 1.0));
-      Pred_00 : constant Class_Label := Predict_Class (CF_Std, (0.0, 0.0));
+      Pred_01 : constant Class_Label := Predict_Class (CF_Std, [0.0, 1.0]);
+      Pred_00 : constant Class_Label := Predict_Class (CF_Std, [0.0, 0.0]);
    begin
       -- Note: Due to small dataset and randomness, it might not perfectly learn XOR, 
       -- but predictions should be within valid label sets.
@@ -63,7 +63,7 @@ begin
    -- TEST 4 — Predict Regression (Standard RF)
    Put_Line ("TEST 4 — Predict Regression (Standard RF)");
    declare
-      Pred_3 : constant Target_Value := Predict_Value (RF_Std, (1 => 3.0));
+      Pred_3 : constant Target_Value := Predict_Value (RF_Std, [1 => 3.0]);
    begin
       Check ("4.1 Predict returns valid regression range", Pred_3 > 5.0 and Pred_3 < 55.0);
       Check ("4.2 Value matches general scale", Pred_3 > 0.0);
@@ -80,7 +80,7 @@ begin
    -- TEST 6 — Predict Classification (Extra Trees)
    Put_Line ("TEST 6 — Predict Classification (Extra Trees)");
    declare
-      Pred_11 : constant Class_Label := Predict_Class (CF_Ext, (1.0, 1.0));
+      Pred_11 : constant Class_Label := Predict_Class (CF_Ext, [1.0, 1.0]);
    begin
       Check ("6.1 Prediction is valid class", Pred_11 = 0 or Pred_11 = 1);
       Check ("6.2 Execution completes", True);
@@ -97,7 +97,7 @@ begin
    -- TEST 8 — Predict Regression (Extra Trees)
    Put_Line ("TEST 8 — Predict Regression (Extra Trees)");
    declare
-      Pred_4 : constant Target_Value := Predict_Value (RF_Ext, (1 => 4.0));
+      Pred_4 : constant Target_Value := Predict_Value (RF_Ext, [1 => 4.0]);
    begin
       Check ("8.1 Extra Trees numeric predict", Pred_4 > 0.0);
       Check ("8.2 Output reasonably bounded", Pred_4 < 60.0);
@@ -109,7 +109,7 @@ begin
    begin
       declare
          -- We purposely use mismatched lengths to trigger assertion / constraint failure
-         Bad_Labels : constant Class_Array (1 .. 3) := (0, 0, 0);
+         Bad_Labels : constant Class_Array (1 .. 3) := [0, 0, 0];
          D : Classification_Forest (1) := Train_Classifier (X_Class, Bad_Labels, 1, 3);
       begin
          Check ("9.1 Mismatched lengths should fail", False);
@@ -141,7 +141,7 @@ begin
    Put_Line ("TEST 11 — Single Element Classification");
    declare
       Single_CF : constant Classification_Forest := Train_Classifier (Single_X, Single_Y_C, 3, 2);
-      Single_Pred : constant Class_Label := Predict_Class (Single_CF, (1 => 42.0));
+      Single_Pred : constant Class_Label := Predict_Class (Single_CF, [1 => 42.0]);
    begin
       Check ("11.1 Trained on one element", True);
       Check ("11.2 Predict single element correctly", Single_Pred = 7);
@@ -152,7 +152,7 @@ begin
    Put_Line ("TEST 12 — Single Element Regression");
    declare
       Single_RF : constant Regression_Forest := Train_Regressor (Single_X, Single_Y_R, 3, 2);
-      Single_Pred : constant Target_Value := Predict_Value (Single_RF, (1 => 42.0));
+      Single_Pred : constant Target_Value := Predict_Value (Single_RF, [1 => 42.0]);
    begin
       Check ("12.1 Trained on one element", True);
       -- Using tolerance for Float comparison
@@ -164,7 +164,7 @@ begin
    Put_Line ("TEST 13 — Feature Extrapolation");
    declare
       -- Test a sample that has more features than model trained on, model should just use what it knows (feature indices are 1-based)
-      Pred_Ext : constant Class_Label := Predict_Class (CF_Std, (0.0, 1.0, 99.9, -4.5));
+      Pred_Ext : constant Class_Label := Predict_Class (CF_Std, [0.0, 1.0, 99.9, -4.5]);
    begin
       Check ("13.1 Extrapolated feature predict ok", True);
       Check ("13.2 Label is valid", Pred_Ext = 0 or Pred_Ext = 1);
@@ -174,7 +174,7 @@ begin
    -- TEST 14 — Model Property Verification
    Put_Line ("TEST 14 — Model Property Verification");
    declare
-      Val : constant Target_Value := Predict_Value (RF_Std, (1 => 2.5));
+      Val : constant Target_Value := Predict_Value (RF_Std, [1 => 2.5]);
    begin
       Check ("14.1 Tree limit discriminant verified", RF_Std.Num_Trees = 10);
       Check ("14.2 Predict maintains pure global state (no side effects)", True);
