@@ -87,7 +87,7 @@ private
       Trees : Tree_Array (1 .. Num_Trees);
    end record;
 
-   type Classification_Forest is new Base_Forest;
-   type Regression_Forest is new Base_Forest;
+   type Classification_Forest (Num_Trees : Positive) is new Base_Forest (Num_Trees => Num_Trees);
+   type Regression_Forest (Num_Trees : Positive) is new Base_Forest (Num_Trees => Num_Trees);
 
 end Random_Forest;
